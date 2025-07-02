@@ -1,15 +1,20 @@
-import React from 'react'
+//@ts-nocheck
+
 import { Outlet } from 'react-router';
 import {SidebarComponent} from "@syncfusion/ej2-react-navigations";
 import { MobileSidebar, NavItems } from 'components';
 
 const AdminLayout = () => {
+  let sidebar: SidebarComponent;
+  const toggleSidebar = () => {
+    sidebar.toggle();
+  };
   return (
     <div className='admin-layout'>
         <MobileSidebar/>
-        <aside className='w-full w-max-[270px] hidden lg:block'>
+        <aside className='w-full max-w-[270px] hidden lg:block'>
             <SidebarComponent width={270} enableGestures={false}>
-                <NavItems/>
+                <NavItems handleClick={toggleSidebar}/>
             </SidebarComponent>
         </aside>
         <aside className='children'><Outlet/></aside>
