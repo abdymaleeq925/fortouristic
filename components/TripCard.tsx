@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router"
 import {ChipDirective, ChipListComponent, ChipsDirective} from "@syncfusion/ej2-react-buttons"
-import { cn, getFirstWord } from "~/lib/utils";
+import { cn, getFirstWord } from "../lib/utils";
 
 const TripCard = ({id, name, location, imageUrl, tags, price}: TripCardProps) => {
   const path = useLocation();

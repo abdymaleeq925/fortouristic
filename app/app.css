@@ -89,6 +89,10 @@
     header {
       @apply flex items-center gap-1.5 justify-center;
     }
+    a {
+      @apply text-center;
+      text-align: -webkit-center;
+    }
     article {
       @apply mt-9 mb-[30px] flex flex-col gap-3;
     }

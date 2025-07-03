@@ -4,9 +4,7 @@ import { account, appwriteConfig, database } from "~/appwrite/client";
 
 export const loginWithGoogle = async() => {
     try {
-        account.createOAuth2Token(
-            OAuthProvider.Google
-        )
+        account.createOAuth2Session(OAuthProvider.Google, 'http://localhost:5173/', 'http://localhost:5173/sign-in')
     } catch(e){
         console.log('loginWithGoogle:', e);
     }
@@ -25,6 +23,7 @@ export const getUser = async() => {
                 Query.select(["name", "email", "imageUrl", "joinedAt", "accountId"])
             ]
         )
+        return documents.length > 0 ? documents[0] : redirect('/sign-in');
     } catch(e){
         console.log(e);
     }
@@ -84,7 +83,7 @@ export const storeUserData = async() => {
 
         if(documents.length > 0) return documents[0];
 
-        const imageUrl = getGooglePicture();
+        const imageUrl = await getGooglePicture();
 
         const newUser = await database.createDocument(
             appwriteConfig.databaseId,
