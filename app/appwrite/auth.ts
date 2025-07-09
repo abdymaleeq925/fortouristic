@@ -4,7 +4,7 @@ import { account, appwriteConfig, database } from "~/appwrite/client";
 
 export const loginWithGoogle = async() => {
     try {
-        account.createOAuth2Session(OAuthProvider.Google, 'http://localhost:5173/', 'http://localhost:5173/sign-in')
+        account.createOAuth2Session(OAuthProvider.Google, 'http://localhost:5173', 'http://localhost:5173/sign-in')
     } catch(e){
         console.log('loginWithGoogle:', e);
     }
@@ -38,6 +38,23 @@ export const logoutUser = async() => {
     }
 }
 
+export const getAllUsers = async(limit:number, offset:number) => {
+    try {
+        const {documents: users, total} = await database.listDocuments(
+            appwriteConfig.databaseId,
+            appwriteConfig.usersCollectionId,
+            [
+                Query.limit(limit), Query.offset(offset)
+            ]
+        ) 
+        if (total === 0) return {users:[], total};
+        return {users, total};
+    } catch(e) {
+        console.log('Error fetching users', e);
+        return {users:[], total:0}
+    }
+}
+
 export const getGooglePicture = async() => {
     try {
         const session = await account.getSession("current");
@@ -59,7 +76,7 @@ export const getGooglePicture = async() => {
         }
 
         const data = await response.json();
-        const photoUrl = data.photos && data.photo.length > 0 ? data.photos[0].url : null;
+        const photoUrl = data?.photos && data?.photos?.length > 0 ? data?.photos[0]?.url : null;
 
         return photoUrl;
     } catch(e){
@@ -107,7 +124,6 @@ export const storeUserData = async() => {
 export const getExistingUser = async() => {
     try {
         const user = await account.get();
-
         if(!user) return null;
 
         const {documents} = await database.listDocuments(

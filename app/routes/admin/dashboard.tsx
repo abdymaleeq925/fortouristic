@@ -5,6 +5,10 @@ import type { Route } from "./+types/dashboard";
 
 const { totalUsers, usersJoined, totalTrips, tripsCreated, userRole } = dashboardStats;
 
+// export async function loader() {
+//   throw new Error("This is Wu-Tang error");
+// }
+
 export const clientLoader = async() => await getUser();
 
 const Dashboard = ({loaderData}: Route.ComponentProps) => {
