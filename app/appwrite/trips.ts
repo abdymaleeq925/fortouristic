@@ -13,8 +13,6 @@ export const getAllTrips = async (limit:number, offset:number) => {
         return {allTrips: [], total:0}
     }
 
-    console.log("allTrips",allTrips)
-
     return {allTrips: allTrips.documents, total: allTrips.total}
 }
 
