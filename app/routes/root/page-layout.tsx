@@ -12,7 +12,7 @@ const PageLayout = () => {
       <button className="cursor-pointer" onClick={handleLogout}>
         <img src="/assets/icons/logout.svg" alt="logout" className="size-6" />
       </button>
-      <button className="cursor-pointer" onClick={() => {navigate('/dashboard')}}>
+      <button className="cursor-pointer" onClick={() => {navigate ('/dashboard')}}>
         Dashboard
       </button>
     </div>

@@ -4,9 +4,9 @@ import { account, appwriteConfig, database } from "~/appwrite/client";
 
 export const loginWithGoogle = async() => {
     try {
-        account.createOAuth2Session(OAuthProvider.Google, 'http://localhost:5173', 'http://localhost:5173/sign-in')
+        account.createOAuth2Session(OAuthProvider.Google, `${window.location.origin}/`, `${window.location.origin}/404`)
     } catch(e){
-        console.log('loginWithGoogle:', e);
+        console.log("Error during OAuth2 session creation:", e);
     }
 }
 
