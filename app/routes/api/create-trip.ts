@@ -1,6 +1,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { ID } from "appwrite";
-import { parseMarkdownToJson } from "lib/utils";
+import { createProduct } from "lib/stripe";
+import { parseMarkdownToJson, parseTripData } from "lib/utils";
 import { data, type ActionFunctionArgs } from "react-router";
 import { appwriteConfig, database } from "~/appwrite/client";
 
@@ -70,6 +71,25 @@ export const action = async ({request}: ActionFunctionArgs) => {
                 createdAt: new Date().toISOString(),
                 imageUrls,
                 userId
+            }
+        )
+        const tripDetail = parseTripData(result.tripDetail) as Trip;
+        const tripPrice = parseInt(tripDetail.estimatedPrice.replace('$', ''), 10);
+        const paymentLink = await createProduct(
+            tripDetail.name,
+            tripDetail.description,
+            imageUrls,
+            tripPrice,
+            result.$id
+        );
+
+        console.log("paymentLink",paymentLink);
+        await database.updateDocument(
+            appwriteConfig.databaseId,
+            appwriteConfig.tripsCollectionId,
+            result.$id,
+            {
+                payment_link: paymentLink.url
             }
         )
         return data({id: result.$id});

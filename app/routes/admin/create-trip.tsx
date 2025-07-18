@@ -139,7 +139,7 @@ const CreateTrip = ({ loaderData }: Route.ComponentProps) => {
               type="number"
               id="duration"
               name="duration"
-              placeholder="Enter a number of days(5,12,...)"
+              placeholder="Enter a number of days(up to 10)"
               className="form-input placeholder:text-gray-100"
               onChange={(e) => handleChange('duration', Number(e.target.value))}
             ></input>
