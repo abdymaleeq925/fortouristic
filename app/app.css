@@ -547,3 +547,17 @@ body {
   top: 45px;
   right: 40px;
 }
+
+.e-multi-select-wrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  input{
+    color: var(--color-dark-300) !important;
+    font-size: 16px !important;
+    font-weight: 400 !important;
+  }
+  .e-chips {
+    margin: 0;
+  }
+}

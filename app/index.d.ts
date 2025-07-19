@@ -155,4 +155,5 @@ declare interface TripFormData {
   budget: string;
   duration: number;
   groupType: string;
+  cities: string[];
 }

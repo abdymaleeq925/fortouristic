@@ -1,4 +1,5 @@
 import { reactRouter } from "@react-router/dev/vite";
+import basicSsl from '@vitejs/plugin-basic-ssl'
 import { sentryReactRouter, type SentryReactRouterBuildOptions } from "@sentry/react-router";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "vite";
@@ -15,7 +16,7 @@ const sentryConfig: SentryReactRouterBuildOptions = {
 
 export default defineConfig(config => {
   return {
-  plugins: [tailwindcss(), tsconfigPaths(), reactRouter(), sentryReactRouter (sentryConfig, config)],
+  plugins: [tailwindcss(), tsconfigPaths(), reactRouter(), sentryReactRouter (sentryConfig, config), basicSsl()],
   sentryConfig,
   ssr: {
     noExternal: [/@syncfusion/]
