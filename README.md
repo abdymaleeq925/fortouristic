@@ -53,7 +53,7 @@ Make sure you have the following installed on your machine:
 
 ```bash
 git clone https://github.com/abdymaleeq925/fortouristic.git
-cd travel-agency-dashboard
+cd fortouristic
 ```
 
 **Installation**
