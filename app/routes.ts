@@ -7,11 +7,11 @@ export default [
         route("dashboard", "routes/admin/dashboard.tsx"),
         route("all-users", "routes/admin/all-users.tsx"),
         route("trips", "routes/admin/trips.tsx"),
-        route("trips/create", "routes/admin/create-trip.tsx"),
         route("trips/:tripId", "routes/admin/trip-detail.tsx"),
     ]),
-    layout("routes/root/page-layout.tsx",[
+    layout("routes/root/page-layout.tsx", [
         index('routes/root/travel-page.tsx'),
+        route("trips/create", "routes/root/create-trip.tsx"),
         route('travel/:tripId', "routes/root/travel-detail.tsx"),
         route('travel/:tripId/success', 'routes/root/payment-success.tsx'),
     ]

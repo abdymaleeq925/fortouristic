@@ -5,12 +5,13 @@ import { parseMarkdownToJson, parseTripData } from "lib/utils";
 import { data, type ActionFunctionArgs } from "react-router";
 import { appwriteConfig, database } from "~/appwrite/client";
 
-export const action = async ({request}: ActionFunctionArgs) => {
+export const action = async ({ request }: ActionFunctionArgs) => {
     const { country, cities, numberOfDays, travelStyle, interests, budget, groupType, userId } = await request.json();
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
     const unsplashApiKey = process.env.UNSPLASH_ACCESS_KEY;
 
     try {
+        console.log("Generating trip for:", { country, cities, numberOfDays });
         const prompt = `Generate a ${numberOfDays}-day travel itinerary for ${country} based on the following user information:
             Budget: '${budget}'
             ${cities.length > 0 && `Cities: ${cities}`}
@@ -26,7 +27,7 @@ export const action = async ({request}: ActionFunctionArgs) => {
             "budget": "${budget}",
             "travelStyle": "${travelStyle}",
             "country": "${country}",
-            "interests": ${interests},
+            "interests": "${interests}",
             "groupType": "${groupType}",
             "bestTimeToVisit": [
             '🌸 Season (from month to month): reason to visit',
@@ -59,10 +60,22 @@ export const action = async ({request}: ActionFunctionArgs) => {
             ]
             }`;
 
-        const textResult = await genAI.getGenerativeModel({model: "gemini-2.0-flash"}).generateContent([prompt]);
-        const trip = parseMarkdownToJson(textResult.response.text());
+        const textResult = await genAI.getGenerativeModel({ model: "gemini-2.0-flash" }).generateContent([prompt]);
+        const tripText = textResult.response.text();
+        console.log("AI Response received");
+
+        const trip = parseMarkdownToJson(tripText);
+        if (!trip) {
+            console.error("Failed to parse AI response as JSON:", tripText);
+            return data({ error: "Не удалось обработать ответ от ИИ. Попробуйте еще раз." }, { status: 500 });
+        }
+
+        console.log("Fetching images from Unsplash...");
         const imageResponse = await fetch(`https://api.unsplash.com/search/photos?query=${country} ${interests} ${travelStyle}&client_id=${unsplashApiKey}`);
-        const imageUrls = (await imageResponse.json()).results.slice(0,3).map((result: any) => result.urls?.regular || null);
+        const imageData = await imageResponse.json();
+        const imageUrls = imageData.results?.slice(0, 3).map((result: any) => result.urls?.regular || null) || [];
+
+        console.log("Saving trip to Appwrite...");
         const result = await database.createDocument(
             appwriteConfig.databaseId,
             appwriteConfig.tripsCollectionId,
@@ -74,8 +87,16 @@ export const action = async ({request}: ActionFunctionArgs) => {
                 userId
             }
         )
-        const tripDetail = parseTripData(result.tripDetail) as Trip;
-        const tripPrice = parseInt(tripDetail.estimatedPrice.replace('$', ''), 10);
+
+        const tripDetail = parseTripData(result.tripDetail);
+        if (!tripDetail) {
+            console.error("Failed to parse saved trip detail");
+            return data({ error: "Ошибка при сохранении данных путешествия." }, { status: 500 });
+        }
+
+        const tripPrice = parseInt(tripDetail.estimatedPrice.replace(/[^0-9]/g, ''), 10) || 100;
+
+        console.log("Creating Stripe payment link...");
         const paymentLink = await createProduct(
             tripDetail.name,
             tripDetail.description,
@@ -84,7 +105,7 @@ export const action = async ({request}: ActionFunctionArgs) => {
             result.$id
         );
 
-        console.log("paymentLink",paymentLink);
+        console.log("Updating trip with payment link:", paymentLink.url);
         await database.updateDocument(
             appwriteConfig.databaseId,
             appwriteConfig.tripsCollectionId,
@@ -93,8 +114,21 @@ export const action = async ({request}: ActionFunctionArgs) => {
                 payment_link: paymentLink.url
             }
         )
-        return data({id: result.$id});
-    } catch (e) {
-        console.error("Error generating travel plan.", e);
+
+        return data({ id: result.$id });
+    } catch (e: any) {
+        console.error("Error generating travel plan:", e);
+
+        let errorMessage = "Произошла внутренняя ошибка сервера. Пожалуйста, попробуйте позже.";
+
+        if (e.message?.includes("429")) {
+            errorMessage = "Лимит запросов к ИИ исчерпан (Free Tier). Пожалуйста, подождите минуту или попробуйте позже.";
+        } else if (e.message?.includes("404")) {
+            errorMessage = "Модель ИИ временно недоступна. Пожалуйста, свяжитесь с поддержкой.";
+        } else if (e.message?.includes("API key")) {
+            errorMessage = "Ошибка конфигурации API ключа. Проверьте настройки сервера.";
+        }
+
+        return data({ error: errorMessage }, { status: 500 });
     }
 }

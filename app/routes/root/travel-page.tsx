@@ -52,7 +52,7 @@ const TravelPage = ({ loaderData }: Route.ComponentProps) => {
                 destination, set your preferences, and explore with confidence.
               </p>
             </article>
-            <Link to="#trips">
+            <Link to="/trips/create">
               <ButtonComponent
                 type="button"
                 className="button-class !h-11 !w-full md:!w-[240px]"

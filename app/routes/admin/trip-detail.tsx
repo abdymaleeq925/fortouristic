@@ -90,7 +90,7 @@ const TripDetail = ({ loaderData }: Route.ComponentProps) => {
               className={cn(
                 "w-full rounded-xl object-cover",
                 i === 0
-                  ? 'md:col-span-2 md"row-span-2 h-[330px]'
+                  ? "md:col-span-2 md:row-span-2 h-[330px]"
                   : "md:row-span-1 h-[150px]"
               )}
             />
@@ -181,21 +181,21 @@ const TripDetail = ({ loaderData }: Route.ComponentProps) => {
         ))}
       </section>
       <section className="flex flex-col gap-6">
-          <h2 className="p-24-semibold text-dark-100">Popular Trips</h2>
-          <div className="trip-grid">
-            {allTrips.map(({id, name, itinerary, imageUrls, interests, travelStyle, estimatedPrice})=>(
-                <TripCard
-                    id={id}
-                    key={id}
-                    name={name}
-                    location={itinerary?.[0].location ?? ""}
-                    imageUrl={imageUrls[0]}
-                    tags={[interests, travelStyle]}
-                    price={estimatedPrice}
-                />
-            ))}
-          </div>
-        </section>
+        <h2 className="p-24-semibold text-dark-100">Popular Trips</h2>
+        <div className="trip-grid">
+          {allTrips.map(({ id, name, itinerary, imageUrls, interests, travelStyle, estimatedPrice }) => (
+            <TripCard
+              id={id}
+              key={id}
+              name={name}
+              location={itinerary?.[0].location ?? ""}
+              imageUrl={imageUrls[0]}
+              tags={[interests, travelStyle]}
+              price={estimatedPrice}
+            />
+          ))}
+        </div>
+      </section>
     </main>
   );
 };

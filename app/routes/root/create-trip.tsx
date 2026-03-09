@@ -6,7 +6,7 @@ import {
 import { Header } from "components";
 import type { Route } from "./+types/create-trip";
 import { comboBoxItems, selectItems } from "~/constants";
-import { cn, formatKey } from "lib/utils";
+import { cn, countryCodeToEmoji, formatKey } from "lib/utils";
 import {
   LayerDirective,
   LayersDirective,
@@ -23,13 +23,6 @@ export const loader = async () => {
     "https://restcountries.com/v3.1/all?fields=name,flags,latlng,maps,cca2"
   );
   const data = await response.json();
-  function countryCodeToEmoji(countryCode: string) {
-    return countryCode
-      .toUpperCase()
-      .replace(/./g, (char: string) =>
-        String.fromCodePoint(127397 + char.charCodeAt(0))
-      );
-  }
   return data.map((country: any) => ({
     name: `${countryCodeToEmoji(country.cca2)} ${country.name?.common}`,
     coordinates: country.latlng,
@@ -154,11 +147,17 @@ const CreateTrip = ({ loaderData }: Route.ComponentProps) => {
           userId: user.$id,
         }),
       });
-      const result: CreateTripResponse = await response.json();
-      if (result?.id) navigate(`/trips/${result.id}`);
-      else console.error("Failed to generate trip");
+      const result = await response.json();
+
+      if (response.ok && result?.id) {
+        navigate(`/travel/${result.id}`);
+      } else {
+        setError(result.error || "Could not create a trip. Try again.");
+        console.error("Failed to generate trip:", result.error);
+      }
     } catch (e) {
       console.error("Error generating trip", e);
+      setError("Error occured during creating a trip. Check the connection.");
     } finally {
       setLoading(false);
     }
@@ -190,7 +189,7 @@ const CreateTrip = ({ loaderData }: Route.ComponentProps) => {
     .map((city) => city.name);
 
   return (
-    <main className="flex flex-col gap-10 pb-20 wrapper">
+    <main className="flex flex-col gap-10 p-32 wrapper">
       <Header
         title="Add a new Trip"
         description="View and edit AI-generated travel plans."
@@ -326,9 +325,8 @@ const CreateTrip = ({ loaderData }: Route.ComponentProps) => {
               disabled={loading}
             >
               <img
-                src={`/assets/icons/${
-                  loading ? "loader.svg" : "magic-star.svg"
-                }`}
+                src={`/assets/icons/${loading ? "loader.svg" : "magic-star.svg"
+                  }`}
                 alt="loading"
                 className={cn("size-5", { "animate-spin": loading })}
               />

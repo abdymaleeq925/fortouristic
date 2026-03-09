@@ -68,3 +68,11 @@ export const formatKey = (key: keyof TripFormData) => {
     .replace(/([A-Z])/g, " $1")
     .replace(/^./, (str) => str.toUpperCase());
 };
+
+export function countryCodeToEmoji(countryCode: string) {
+  return countryCode
+    .toUpperCase()
+    .replace(/./g, (char: string) =>
+      String.fromCodePoint(127397 + char.charCodeAt(0))
+    );
+}

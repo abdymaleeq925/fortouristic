@@ -10,7 +10,7 @@ interface Props {
   ctaUrl?: string
 }
 
-const Header = ({title, description, ctaText, ctaUrl}: Props) => {
+const Header = ({ title, description, ctaText, ctaUrl }: Props) => {
   const location = useLocation();
   return (
     <header className='header'>
@@ -21,8 +21,8 @@ const Header = ({title, description, ctaText, ctaUrl}: Props) => {
       {
         ctaText && ctaUrl && (
           <Link to={ctaUrl}>
-            <ButtonComponent type='button' className='button-class !h-11 !w-full md:w[240px]'>
-              <img src="assets/icons/plus.svg" alt="plus" className='size-6'/>
+            <ButtonComponent type='button' className='button-class !h-11 !w-full md:!w-[240px]'>
+              <img src="/assets/icons/plus.svg" alt="plus" className='size-6' />
               <span className='p-16-semibold text-white'>{ctaText}</span>
             </ButtonComponent>
           </Link>
